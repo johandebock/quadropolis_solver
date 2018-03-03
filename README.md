@@ -4,7 +4,7 @@ The python script `quadropolis_solver.py` will generate high VP solutions to the
 
 I highly recommend using [PyPy](https://pypy.org) to run the script, it should be about a factor 4 faster than regular python.
 
-To get started simply run `pypy quadropolis_solver.py`. By default the script will generate solutions of atleast 108 VP that use 5 of the Public Services expansion tiles. When a solution has been found it is printed out like this:
+To get started simply run `pypy quadropolis_solver.py`. By default the script will generate solutions of atleast 108 VP that use 5 random tiles of the Public Services expansion. When a solution has been found it is printed out like this:
 ```
 [['U', '_', 'U', 'O', 'F'],
  ['M', 'P', 'O', 'U', 'O'],
@@ -22,7 +22,7 @@ cnt  20 |  4 |  0 |  5 |  4 |  2 |  0 |  4 |  1
 pts 119 |  7 |  0 | 25 | 19 | 16 |  0 | 20 | 12 | 20
 ```
 
-You can use following table to link the letter codes with the actual buildings. Note that for optimization reasons the variations on some buildings in the actual game are reduced (for example for Tower Blocks only the +2 population variant is used).
+You can use following table to link the letter codes with the actual building tiles. Note that for optimization reasons the variations on some buildings in the actual game are reduced (for example for Tower Blocks only the +2 population variant is used).
 ```
 T Tower Blocks (+2 population)
 S Shops
