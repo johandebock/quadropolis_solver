@@ -23,23 +23,24 @@
 ## Monuments                         01111  4  4 Monuments
 
 ## types and distribution used for calculation
-## T Tower Blocks (+123 population random) 8
-## S Shops                                 4
-## U Public Services (+1 VP)               5
-## P Parks (-1 energy penalty)             3
-## G Playgrounds (+1 population)           2
-## F Factories (+3 energy)                 2
-## A Factories (+2 energy)                 3
-## 1 Harbors (+1 energy +1 population)     5
-## 2 Harbors (+2 VP)                       3
-## O Office Towers                         8
-## M Monuments                             M
+## T Tower Blocks (+2 population)       8
+## S Shops                              4
+## U Public Services (+1 VP)            5
+## P Parks (-1 energy penalty)          3
+## G Playgrounds (+1 population)        2
+## F Factories (+3 energy)              2
+## A Factories (+2 energy)              3
+## 1 Harbors (+1 energy +1 population)  5
+## 2 Harbors (+2 VP)                    3
+## O Office Towers                      8
+## M Monuments                          M
 
 ## types and distribution for manual finetuning
-## Tower Blocks (+3 pop) through pop boost 1
-## U -> B Public Services (+2 VP)          2
-## 1 -> 3 Harbors (+3 VP)                  1
-## 1 -> 4 Harbors (+2 population)          1
+## Tower Blocks (+3 pop) extra_pop +1   1
+## Tower Blocks (+1 pop) extra_pop -1   1
+## U -> B Public Services (+2 VP)       2
+## 1 -> 3 Harbors (+3 VP)               1
+## 1 -> 4 Harbors (+2 population)       1
 
 from __future__ import print_function
 from __future__ import division
