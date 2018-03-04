@@ -59,4 +59,4 @@ quad--119--405_22_20_00_41--14_06--07_00_25_19_16_00_20_12_20--capi_cong_hall_pa
 ```
 The filename contains the VP total, counts of all building types, produced population and energy, points for all building types and used expansion tiles.
 
-You can find more already generated optimal board layouts in the solution_* folders.
+You can find more already generated optimal board layouts in the solutions_* folders.
