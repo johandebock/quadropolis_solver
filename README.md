@@ -1,10 +1,10 @@
 # Quadropolis solver
 
-The python script `quadropolis_solver.py` will generate high VP solutions to the Quadropolis board game (and the Public Services expansion).
+The python script `quadropolis_solver.py` will generate high VP board layouts for the Quadropolis board game (and the Public Services expansion).
 
 I highly recommend using [PyPy](https://pypy.org) to run the script, it should be about a factor 4 faster than regular python.
 
-To get started simply run `pypy quadropolis_solver.py`. By default the script will generate solutions of atleast 108 VP that use 5 random tiles of the Public Services expansion. When a solution has been found it is printed out like this:
+To get started simply run `pypy quadropolis_solver.py`. By default the script will generate board layouts of atleast 108 VP that use 5 random tiles of the Public Services expansion. When a board layout has been found it is printed out like this:
 ```
 [['U', '_', 'U', 'O', 'F'],
  ['M', 'P', 'O', 'U', 'O'],
@@ -22,7 +22,7 @@ cnt  20 |  4 |  0 |  5 |  4 |  2 |  0 |  4 |  1
 pts 119 |  7 |  0 | 25 | 19 | 16 |  0 | 20 | 12 | 20
 ```
 
-You can use the following table to link the letter codes with the actual building tiles. Note that for optimization reasons the variations on some buildings in the actual game are reduced (for example for Tower Blocks only the +2 population variant is used).
+You can use the following table to link the letter codes with the full building names. Note that for optimization reasons the variations of some buildings in the actual game are reduced (for example for Tower Blocks only the +2 population variant is used).
 ```
 T Tower Blocks (+2 population)
 S Shops
@@ -50,10 +50,11 @@ scho School
 tvst TV Station
 ward Maternity Ward
 ```
-![image of board](https://raw.githubusercontent.com/johandebock/quadropolis_solver/master/solutions_expansion_1monument/quad--119--405_22_20_00_41--14_06--07_00_25_19_16_00_20_12_20--capi_cong_hall_park_ward.jpg)
+If you would make this board layout in the actual game it would look like this:
+![image of board layout](https://raw.githubusercontent.com/johandebock/quadropolis_solver/master/solutions_expansion_1monument/quad--119--405_22_20_00_41--14_06--07_00_25_19_16_00_20_12_20--capi_cong_hall_park_ward.jpg)
 
 The solution is also saved in a log file:
 ```
 quad--119--405_22_20_00_41--14_06--07_00_25_19_16_00_20_12_20--capi_cong_hall_park_ward.log
 ```
-The filename contains the VP total, counts of all buildings, produced population and energy, points for all buildings and used expansion tiles.
+The filename contains the VP total, counts of all building types, produced population and energy, points for all building types and used expansion tiles.
