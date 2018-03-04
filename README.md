@@ -22,7 +22,7 @@ cnt  20 |  4 |  0 |  5 |  4 |  2 |  0 |  4 |  1
 pts 119 |  7 |  0 | 25 | 19 | 16 |  0 | 20 | 12 | 20
 ```
 
-You can use following table to link the letter codes with the actual building tiles. Note that for optimization reasons the variations on some buildings in the actual game are reduced (for example for Tower Blocks only the +2 population variant is used).
+You can use the following table to link the letter codes with the actual building tiles. Note that for optimization reasons the variations on some buildings in the actual game are reduced (for example for Tower Blocks only the +2 population variant is used).
 ```
 T Tower Blocks (+2 population)
 S Shops
