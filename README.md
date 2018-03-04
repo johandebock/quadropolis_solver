@@ -50,6 +50,7 @@ scho School
 tvst TV Station
 ward Maternity Ward
 ```
+![image of board](https://raw.githubusercontent.com/johandebock/quadropolis_solver/master/solutions_expansion_1monument/quad--119--405_22_20_00_41--14_06--07_00_25_19_16_00_20_12_20--capi_cong_hall_park_ward.jpg)
 
 The solution is also saved in a log file:
 ```
