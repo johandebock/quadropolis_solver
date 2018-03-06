@@ -806,27 +806,33 @@ elif args.mode == 'opti':
         print('')
         max_bo = copy.deepcopy(bo)
         max_points = bo.pts_total
-        new_max_found = True
-        while new_max_found:
-            new_max_found = False
-            bo.swap_init()
-            while bo.swap():
-                pts_tower = bo.calc_points_tower()
-                pts_shop = bo.calc_points_shop()
-                pts_public = bo.calc_points_public()
-                pts_park = bo.calc_points_park()
-                pts_factory = bo.calc_points_factory()
-                pts_harbor = bo.calc_points_harbor()
-                pts_office = bo.calc_points_office()
-                pts_monument = bo.calc_points_monument()
-                pts_expansion = bo.calc_points_expansion()
-                points = pts_tower + pts_shop + pts_public + pts_park + pts_factory + pts_harbor + pts_office + pts_monument + pts_expansion
-                if points > max_points:
-                    max_bo = copy.deepcopy(bo)
-                    max_points = points
-                    new_max_found = True
-            if new_max_found:
-                bo = copy.deepcopy(max_bo)
+        max_exp = list(args.exp)
+        for args.exp in [x for x in itertools.combinations(exp_choices, len(args.exp))]:
+            bo.calc_resources()
+            if bo.popula_used <= bo.popula and bo.energy_used <= bo.energy:
+                new_max_found = True
+                while new_max_found:
+                    new_max_found = False
+                    bo.swap_init()
+                    while bo.swap():
+                        pts_tower = bo.calc_points_tower()
+                        pts_shop = bo.calc_points_shop()
+                        pts_public = bo.calc_points_public()
+                        pts_park = bo.calc_points_park()
+                        pts_factory = bo.calc_points_factory()
+                        pts_harbor = bo.calc_points_harbor()
+                        pts_office = bo.calc_points_office()
+                        pts_monument = bo.calc_points_monument()
+                        pts_expansion = bo.calc_points_expansion()
+                        points = pts_tower + pts_shop + pts_public + pts_park + pts_factory + pts_harbor + pts_office + pts_monument + pts_expansion
+                        if points > max_points:
+                            max_bo = copy.deepcopy(bo)
+                            max_points = points
+                            max_exp = list(args.exp)
+                            new_max_found = True
+                    if new_max_found:
+                        bo = copy.deepcopy(max_bo)
+        args.exp = list(max_exp)
         max_bo_string = max_bo.gen_board_string_calc_resources_counts_points(extra_pop)
         print(max_bo_string)
         os.remove(args.log)
