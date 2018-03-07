@@ -38,9 +38,10 @@
 ## types and distribution for manual finetuning
 ## Tower Blocks (+3 pop) extra_pop +1   1
 ## Tower Blocks (+1 pop) extra_pop -1   1
-## U -> B Public Services (+2 VP)       2
-## 1 -> 3 Harbors (+3 VP)               1
-## 1 -> 4 Harbors (+2 population)       1
+## U   -> B Public Services (+2 VP)     2
+## 1 2 -> 3 Harbors (+3 VP)             1
+## 1 2 -> 4 Harbors (+2 population)     1
+## 1 2 -> 5 Harbors (+2 energy)         1
 
 from __future__ import print_function
 from __future__ import division
@@ -74,13 +75,14 @@ def floodfill(im, start_ij):
     return visited
 
 class Board:
-    def __init__(self, b=['_'] * 20, f=[1] * 20):
+    def __init__(self, b=['_'] * 20, f=[1] * 20, extra_pop=0):
         """initialise a 4x5 board
         """
         self.flat_b = b
         self.flat_f = f
         self.b = [['_'] * 5] * 4
         self.f = [[1] * 5] * 4
+        self.extra_pop = extra_pop
         self.flat2rect()
 
     def random_valid(self):
@@ -182,7 +184,7 @@ class Board:
         self.nb_swaps = len(self.swaplist)
         self.cnt_swap = 0
 
-    def gen_board_string_calc_resources_counts_points(self, extra_pop=0, tune=False):
+    def gen_board_string_calc_resources_counts_points(self, tune=False):
         """generate a string with 4x5 board, used expansion tiles, produced and used population and energy, counts of all buildings, points for all buildings
         for example:
         [['U', '_', 'U', 'O', 'F'],
@@ -204,6 +206,7 @@ class Board:
             list_B = []
             list_3 = []
             list_4 = []
+            list_5 = []
             for i in range(20):
                 if self.flat_b[i] == 'B':
                     list_B.append(i)
@@ -214,15 +217,20 @@ class Board:
                 elif self.flat_b[i] == '4':
                     list_4.append(i)
                     self.flat_b[i] = '1'
+                elif self.flat_b[i] == '5':
+                    list_5.append(i)
+                    self.flat_b[i] = '1'
             self.flat2rect()
         self.calc_resources()
-        self.popula += extra_pop
         self.cnt_T = self.cnt_S = self.cnt_U = self.cnt_P = self.cnt_G = self.cnt_F = self.cnt_A = self.cnt_1 = self.cnt_2 = self.cnt_O = self.cnt_M = 0
         pop_norm = 0
         if tune:
             self.popula += len(list_4)
             pop_norm += len(list_4)
             self.energy -= len(list_4)
+            self.popula -= len(list_5)
+            pop_norm -= len(list_5)
+            self.energy += len(list_5)
         for i in range(20):
             b = self.flat_b[i]
             if b == 'T':
@@ -273,6 +281,8 @@ class Board:
                 self.flat_b[i] = '3'
             for i in list_4:
                 self.flat_b[i] = '4'
+            for i in list_5:
+                self.flat_b[i] = '5'
             self.flat2rect()
         self.pts_total = self.pts_tower + self.pts_shop + self.pts_public + self.pts_park + self.pts_factory + self.pts_harbor + self.pts_office + self.pts_monument + self.pts_expansion
         return '{}\n{}\nexpansion {}\npop {:2} | {:2} | {:2} | {:2}\nene {:2} | {:2} | {:2}\n   Total Towe Shop Publ Park Fact Harb Offi Monu Expa\ncnt {:3} | {:2} | {:2} | {:2} | {:2} | {:2} | {:2} | {:2} | {:2}\npts {:3} | {:2} | {:2} | {:2} | {:2} | {:2} | {:2} | {:2} | {:2} | {:2}'.format(pprint.pformat(self.b, width=40), pprint.pformat(self.f, width=20), ' '.join(sorted(args.exp)), self.popula, self.popula_used, self.popula - self.popula_used, self.popula - pop_norm, self.energy, self.energy_used, self.energy - self.energy_used, self.cnt_total, self.cnt_T, self.cnt_S, self.cnt_U, self.cnt_P + self.cnt_G, self.cnt_F + self.cnt_A, self.cnt_1 + self.cnt_2, self.cnt_O, self.cnt_M, self.pts_total, self.pts_tower, self.pts_shop, self.pts_public, self.pts_park, self.pts_factory, self.pts_harbor, self.pts_office, self.pts_monument, self.pts_expansion)
@@ -294,6 +304,7 @@ class Board:
         """
         self.popula = self.energy = self.popula_used = self.energy_used = 0
         self.cnt_public = self.cnt_shop = self.cnt_1 = self.cnt_2 = self.cnt_office = 0
+        self.popula += self.extra_pop
         for i in range(20):
             b = self.flat_b[i]
             if b == 'T':
@@ -717,6 +728,7 @@ parser.add_argument('-exp', nargs='+', choices=['all1', 'all2', 'all3', 'all4', 
 parser.add_argument('-monuments', type=int, default=1)
 parser.add_argument('-minvp', type=int, default=108)
 parser.add_argument('-swapmin', type=int, default=66)
+parser.add_argument('-extrapop', type=int, default=0)
 args = parser.parse_args()
 
 if args.mode == 'find':
@@ -733,7 +745,7 @@ if args.mode == 'find':
     t1 = time.time()
     nr_boards_tried = 0
     max_max_points = 0
-    bo = Board()
+    bo = Board(extra_pop=args.extrapop)
     while True:
         bo.random_valid()
         nr_boards_tried += 1
@@ -800,8 +812,8 @@ elif args.mode == 'opti':
         f += [int(x.strip().strip("'[]")) for x in log[7].split(',')[0:5]]
         args.exp = log[8].strip().split(' ')[1:]
         extra_pop = int(log[9].split('|')[-1])
-        bo = Board(b, f)
-        bo_string = bo.gen_board_string_calc_resources_counts_points(extra_pop)
+        bo = Board(b, f, extra_pop)
+        bo_string = bo.gen_board_string_calc_resources_counts_points()
         print(bo_string)
         print('')
         max_bo = copy.deepcopy(bo)
@@ -833,7 +845,7 @@ elif args.mode == 'opti':
                     if new_max_found:
                         bo = copy.deepcopy(max_bo)
         args.exp = list(max_exp)
-        max_bo_string = max_bo.gen_board_string_calc_resources_counts_points(extra_pop)
+        max_bo_string = max_bo.gen_board_string_calc_resources_counts_points()
         print(max_bo_string)
         os.remove(args.log)
         filename = max_bo.gen_filename()
@@ -857,8 +869,8 @@ elif args.mode == 'tune':
         f += [int(x.strip().strip("'[]")) for x in log[7].split(',')[0:5]]
         args.exp = log[8].strip().split(' ')[1:]
         extra_pop = int(log[9].split('|')[-1])
-        bo = Board(b, f)
-        bo_string = bo.gen_board_string_calc_resources_counts_points(extra_pop, tune=True)
+        bo = Board(b, f, extra_pop)
+        bo_string = bo.gen_board_string_calc_resources_counts_points(tune=True)
         print(bo_string)
         os.remove(args.log)
         filename = bo.gen_filename()
