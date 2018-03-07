@@ -30,9 +30,10 @@
 ## G Playgrounds (+1 population)        2
 ## F Factories (+3 energy)              2
 ## A Factories (+2 energy)              3
-## 1 Harbors (+1 energy +1 population)  5
+## 1 Harbors (+1 energy +1 population)  4
 ## 2 Harbors (+2 VP)                    2
 ## 3 Harbors (+3 VP)                    1
+## 4 Harbors (+2 population)            1
 ## O Office Towers                      8
 ## M Monuments                          M
 
@@ -40,7 +41,6 @@
 ## Tower Blocks (+3 pop) extra_pop +1   1
 ## Tower Blocks (+1 pop) extra_pop -1   1
 ## U   -> B Public Services (+2 VP)     2
-## 1 2 -> 4 Harbors (+2 population)     1
 ## 1 2 -> 5 Harbors (+2 energy)         1
 
 from __future__ import print_function
@@ -93,11 +93,11 @@ class Board:
         if random_exp > 0:
             args.exp = random.sample(exp_choices, random_exp)
         while True:
-            ##    TSU_PG_FA_123_OM
-            ## tot845_32_23_521_81
-            ## min00E_00_00_000_00
-            btypes =     ['T']*8+['S']*4+['U']*(5 - len(args.exp))+['P']*3+['G']*2+['F']*2+['A']*3+['1']*5+['2']*2+['3']*1+['O']*8+['M']*args.monuments
-            btypes_min = ['T']*0+['S']*0+['U']*len(args.exp)      +['P']*0+['G']*0+['F']*0+['A']*0+['1']*0+['2']*0+['3']*0+['O']*0+['M']*0
+            ##    TSU_PG_FA_1234_OM
+            ## tot845_32_23_4211_81
+            ## min00E_00_00_0000_00
+            btypes =     ['T']*8+['S']*4+['U']*(5 - len(args.exp))+['P']*3+['G']*2+['F']*2+['A']*3+['1']*4+['2']*2+['3']*1+['4']*1+['O']*8+['M']*args.monuments
+            btypes_min = ['T']*0+['S']*0+['U']*len(args.exp)      +['P']*0+['G']*0+['F']*0+['A']*0+['1']*0+['2']*0+['3']*0+['4']*0+['O']*0+['M']*0
             bpos = list(range(20))
             self.flat_b = ['_'] * 20
             self.flat_f = [1] * 20
@@ -204,26 +204,19 @@ class Board:
         """
         if tune:
             list_B = []
-            list_4 = []
             list_5 = []
             for i in range(20):
                 if self.flat_b[i] == 'B':
                     list_B.append(i)
                     self.flat_b[i] = 'U'
-                elif self.flat_b[i] == '4':
-                    list_4.append(i)
-                    self.flat_b[i] = '1'
                 elif self.flat_b[i] == '5':
                     list_5.append(i)
                     self.flat_b[i] = '1'
             self.flat2rect()
         self.calc_resources()
-        self.cnt_T = self.cnt_S = self.cnt_U = self.cnt_P = self.cnt_G = self.cnt_F = self.cnt_A = self.cnt_1 = self.cnt_2 = self.cnt_3 = self.cnt_O = self.cnt_M = 0
+        self.cnt_T = self.cnt_S = self.cnt_U = self.cnt_P = self.cnt_G = self.cnt_F = self.cnt_A = self.cnt_1 = self.cnt_2 = self.cnt_3 = self.cnt_4 = self.cnt_O = self.cnt_M = 0
         pop_norm = 0
         if tune:
-            self.popula += len(list_4)
-            pop_norm += len(list_4)
-            self.energy -= len(list_4)
             self.popula -= len(list_5)
             pop_norm -= len(list_5)
             self.energy += len(list_5)
@@ -252,6 +245,9 @@ class Board:
                 self.cnt_2 += 1
             elif b == '3':
                 self.cnt_3 += 1
+            elif b == '4':
+                self.cnt_4 += 1
+                pop_norm += 2
             elif b == 'O':
                 self.cnt_O += self.flat_f[i]
             elif b == 'M':
@@ -260,7 +256,7 @@ class Board:
             pop_norm += self.cnt_S
         if 'ward' in args.exp:
             pop_norm += 3
-        self.cnt_total = self.cnt_T + self.cnt_S + self.cnt_U + self.cnt_P + self.cnt_G + self.cnt_F + self.cnt_A + self.cnt_1 + self.cnt_2 + self.cnt_3 + self.cnt_O + self.cnt_M
+        self.cnt_total = self.cnt_T + self.cnt_S + self.cnt_U + self.cnt_P + self.cnt_G + self.cnt_F + self.cnt_A + self.cnt_1 + self.cnt_2 + self.cnt_3 + self.cnt_4 + self.cnt_O + self.cnt_M
         self.pts_tower = self.calc_points_tower()
         self.pts_shop = self.calc_points_shop()
         self.pts_public = self.calc_points_public()
@@ -274,13 +270,11 @@ class Board:
             self.pts_public += len(list_B)
             for i in list_B:
                 self.flat_b[i] = 'B'
-            for i in list_4:
-                self.flat_b[i] = '4'
             for i in list_5:
                 self.flat_b[i] = '5'
             self.flat2rect()
         self.pts_total = self.pts_tower + self.pts_shop + self.pts_public + self.pts_park + self.pts_factory + self.pts_harbor + self.pts_office + self.pts_monument + self.pts_expansion
-        return '{}\n{}\nexpansion {}\npop {:2} | {:2} | {:2} | {:2}\nene {:2} | {:2} | {:2}\n   Total Towe Shop Publ Park Fact Harb Offi Monu Expa\ncnt {:3} | {:2} | {:2} | {:2} | {:2} | {:2} | {:2} | {:2} | {:2}\npts {:3} | {:2} | {:2} | {:2} | {:2} | {:2} | {:2} | {:2} | {:2} | {:2}'.format(pprint.pformat(self.b, width=40), pprint.pformat(self.f, width=20), ' '.join(sorted(args.exp)), self.popula, self.popula_used, self.popula - self.popula_used, self.popula - pop_norm, self.energy, self.energy_used, self.energy - self.energy_used, self.cnt_total, self.cnt_T, self.cnt_S, self.cnt_U, self.cnt_P + self.cnt_G, self.cnt_F + self.cnt_A, self.cnt_1 + self.cnt_2 + self.cnt_3, self.cnt_O, self.cnt_M, self.pts_total, self.pts_tower, self.pts_shop, self.pts_public, self.pts_park, self.pts_factory, self.pts_harbor, self.pts_office, self.pts_monument, self.pts_expansion)
+        return '{}\n{}\nexpansion {}\npop {:2} | {:2} | {:2} | {:2}\nene {:2} | {:2} | {:2}\n   Total Towe Shop Publ Park Fact Harb Offi Monu Expa\ncnt {:3} | {:2} | {:2} | {:2} | {:2} | {:2} | {:2} | {:2} | {:2}\npts {:3} | {:2} | {:2} | {:2} | {:2} | {:2} | {:2} | {:2} | {:2} | {:2}'.format(pprint.pformat(self.b, width=40), pprint.pformat(self.f, width=20), ' '.join(sorted(args.exp)), self.popula, self.popula_used, self.popula - self.popula_used, self.popula - pop_norm, self.energy, self.energy_used, self.energy - self.energy_used, self.cnt_total, self.cnt_T, self.cnt_S, self.cnt_U, self.cnt_P + self.cnt_G, self.cnt_F + self.cnt_A, self.cnt_1 + self.cnt_2 + self.cnt_3 + self.cnt_4, self.cnt_O, self.cnt_M, self.pts_total, self.pts_tower, self.pts_shop, self.pts_public, self.pts_park, self.pts_factory, self.pts_harbor, self.pts_office, self.pts_monument, self.pts_expansion)
 
     def gen_filename(self):
         """generate a filename with total points, counts of all buildings, produced population and energy, points for all buildings, used expansion tiles
@@ -290,7 +284,7 @@ class Board:
         for T and O counts hexadecimals are used when > 9
         """
         expansion_string = '_'.join(sorted(args.exp)) if args.exp else 'noexp'
-        return 'quad--{}--{}{}{}_{}{}_{}{}_{}{}{}_{}{}--{:02}_{:02}--{:02}_{:02}_{:02}_{:02}_{:02}_{:02}_{:02}_{:02}_{:02}--{}.log'.format(self.pts_total, hex(self.cnt_T)[-1:], self.cnt_S, self.cnt_U, self.cnt_P, self.cnt_G, self.cnt_F, self.cnt_A, self.cnt_1, self.cnt_2, self.cnt_3, hex(self.cnt_O)[-1:], self.cnt_M, self.popula, self.energy, self.pts_tower, self.pts_shop, self.pts_public, self.pts_park, self.pts_factory, self.pts_harbor, self.pts_office, self.pts_monument, self.pts_expansion, expansion_string)
+        return 'quad--{}--{}{}{}_{}{}_{}{}_{}{}{}{}_{}{}--{:02}_{:02}--{:02}_{:02}_{:02}_{:02}_{:02}_{:02}_{:02}_{:02}_{:02}--{}.log'.format(self.pts_total, hex(self.cnt_T)[-1:], self.cnt_S, self.cnt_U, self.cnt_P, self.cnt_G, self.cnt_F, self.cnt_A, self.cnt_1, self.cnt_2, self.cnt_3, self.cnt_4, hex(self.cnt_O)[-1:], self.cnt_M, self.popula, self.energy, self.pts_tower, self.pts_shop, self.pts_public, self.pts_park, self.pts_factory, self.pts_harbor, self.pts_office, self.pts_monument, self.pts_expansion, expansion_string)
 
     def calc_resources(self):
         """calculate produced and used population and energy
@@ -298,7 +292,7 @@ class Board:
         unchanged while swapping buildings on board
         """
         self.popula = self.energy = self.popula_used = self.energy_used = 0
-        self.cnt_public = self.cnt_shop = self.cnt_1 = self.cnt_2 = self.cnt_3 = self.cnt_office = 0
+        self.cnt_public = self.cnt_shop = self.cnt_1 = self.cnt_2 = self.cnt_3 = self.cnt_4 = self.cnt_office = 0
         self.popula += self.extra_pop
         for i in range(20):
             b = self.flat_b[i]
@@ -312,20 +306,24 @@ class Board:
             elif b == 'U':
                 self.popula_used += 1
                 self.cnt_public += 1
+            elif b == 'S':
+                self.energy_used += 1
+                self.cnt_shop += 1
             elif b == '1':
                 self.popula += 1
                 self.energy += 1
                 self.popula_used += 1
                 self.cnt_1 += 1
-            elif b == 'S':
-                self.energy_used += 1
-                self.cnt_shop += 1
             elif b == '2':
                 self.popula_used += 1
                 self.cnt_2 += 1
             elif b == '3':
                 self.popula_used += 1
                 self.cnt_3 += 1
+            elif b == '4':
+                self.popula += 2
+                self.popula_used += 1
+                self.cnt_4 += 1
             elif b == 'A':
                 self.energy += 2
                 self.popula_used += 1
@@ -482,7 +480,7 @@ class Board:
         """calculate Harbor and Customs Office points
         """
         points = 0
-        if self.cnt_1 + self.cnt_2 + self.cnt_3 >= 2:
+        if self.cnt_1 + self.cnt_2 + self.cnt_3 + self.cnt_4 >= 2:
             hor = 0
             for i in range(4):
                 j = 0
