@@ -716,7 +716,7 @@ class Board:
 parser = argparse.ArgumentParser(formatter_class=argparse.RawTextHelpFormatter)
 parser.add_argument('-mode', choices=['find', 'opti', 'tune'], default='find')
 parser.add_argument('-log')
-parser.add_argument('-exp', nargs='+', choices=['all1', 'all2', 'all3', 'all4', 'all5', 'capi', 'cong', 'cust', 'elec', 'fire', 'hall', 'park', 'plan', 'poli', 'repr', 'scho', 'tvst', 'ward'], default=['all5'])
+parser.add_argument('-exp', nargs='+', choices=['none', 'all1', 'all2', 'all3', 'all4', 'all5', 'capi', 'cong', 'cust', 'elec', 'fire', 'hall', 'park', 'plan', 'poli', 'repr', 'scho', 'tvst', 'ward'], default=['all5'])
 parser.add_argument('-monuments', type=int, default=1)
 parser.add_argument('-minvp', type=int, default=108)
 parser.add_argument('-swapmin', type=int, default=66)
@@ -724,7 +724,9 @@ parser.add_argument('-extrapop', type=int, default=0)
 args = parser.parse_args()
 
 if args.mode == 'find':
-    if 'all1' in args.exp:
+    if 'none' in args.exp:
+        args.exp = []
+    elif 'all1' in args.exp:
         random_exp = 1
     elif 'all2' in args.exp:
         random_exp = 2
