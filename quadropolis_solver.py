@@ -709,6 +709,60 @@ class Board:
             tot_points += max_points
         return tot_points
 
+    def calc_points_all_expansions(self):
+        """calculate points from VP scoring expansion tiles
+        """
+        points = self.calc_points_expansion()
+        if 'cust' in args.exp and self.cnt_1 + self.cnt_2 + self.cnt_3 + self.cnt_4 + self.cnt_5 >= 2:
+            hor = 0
+            for i in range(4):
+                j = 0
+                while j < 5 and ord(self.b[i][j]) >= 54:
+                    j += 1
+                if j < 4:
+                    start = j
+                    j += 1
+                    while j < 5 and ord(self.b[i][j]) < 54:
+                        j += 1
+                    len = j - start
+                    if len > hor:
+                        hor = len
+            ver = 0
+            for j in range(5):
+                i = 0
+                while i < 4 and ord(self.b[i][j]) >= 54:
+                    i += 1
+                if i < 3:
+                    start = i
+                    i += 1
+                    while i < 4 and ord(self.b[i][j]) < 54:
+                        i += 1
+                    len = i - start
+                    if len > ver:
+                        ver = len
+            if ver == 4 or hor == 5:
+                points += 5
+        if 'hall' in args.exp:
+            points += self.cnt_public
+        if 'park' in args.exp:
+            cnt_PG = 0
+            for i in range(20):
+                if self.flat_b[i] == 'P' or self.flat_b[i] == 'G':
+                        cnt_PG += 1
+            points += cnt_PG
+        if 'poli' in args.exp:
+            points += max(self.flat_f)
+        if 'repr' in args.exp:
+            recycle_energy = max(self.energy - self.energy_used, 0)
+            points += recycle_energy
+        if 'scho' in args.exp:
+            cnt_tower = 0
+            for i in range(20):
+                if self.flat_b[i] == 'T':
+                    cnt_tower += 1
+            points += cnt_tower
+        return points
+
 
 
 
@@ -809,6 +863,7 @@ elif args.mode == 'opti':
         bo = Board(b, f, extra_pop)
         bo_string = bo.gen_board_string_calc_resources_counts_points()
         print(bo_string)
+        print('pts all exp', bo.calc_points_all_expansions())
         print('')
         max_bo = copy.deepcopy(bo)
         max_points = bo.pts_total
@@ -841,6 +896,7 @@ elif args.mode == 'opti':
         args.exp = list(max_exp)
         max_bo_string = max_bo.gen_board_string_calc_resources_counts_points()
         print(max_bo_string)
+        print('pts all exp', max_bo.calc_points_all_expansions())
         os.remove(args.log)
         filename = max_bo.gen_filename()
         print('writing to {}'.format(filename))
@@ -866,6 +922,7 @@ elif args.mode == 'tune':
         bo = Board(b, f, extra_pop)
         bo_string = bo.gen_board_string_calc_resources_counts_points(tune=True)
         print(bo_string)
+        print('pts all exp', bo.calc_points_all_expansions())
         os.remove(args.log)
         filename = bo.gen_filename()
         print('writing to {}'.format(filename))
