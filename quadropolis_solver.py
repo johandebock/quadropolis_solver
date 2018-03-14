@@ -774,9 +774,9 @@ parser.add_argument('-mode', choices=['find', 'opti', 'tune'], default='find')
 parser.add_argument('-log')
 parser.add_argument('-exp', nargs='+', choices=['none', 'all1', 'all2', 'all3', 'all4', 'all5', 'max1', 'max2', 'max3', 'max4', 'max5', 'capi', 'cong', 'cust', 'elec', 'fire', 'hall', 'park', 'plan', 'poli', 'repr', 'scho', 'tvst', 'ward'], default=['max5'])
 parser.add_argument('-monuments', type=int, default=1)
+parser.add_argument('-extrapop', type=int, default=1)
 parser.add_argument('-minvp', type=int, default=108)
 parser.add_argument('-swapmin', type=int, default=66)
-parser.add_argument('-extrapop', type=int, default=0)
 args = parser.parse_args()
 
 if args.mode == 'find':
