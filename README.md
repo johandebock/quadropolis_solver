@@ -4,7 +4,7 @@ The python script `quadropolis_solver.py` will generate high VP board layouts fo
 
 I highly recommend using [PyPy](https://pypy.org) to run the script, it should be about a factor 4 faster than regular python.
 
-To get started simply run `pypy quadropolis_solver.py`. By default the script will generate board layouts of atleast 108 VP that use 5 random tiles of the Public Services expansion. When a board layout has been found it is printed out like this:
+To get started simply run `pypy quadropolis_solver.py`. By default the script will generate board layouts of atleast 108 VP that use up to 5 random tiles of the Public Services expansion. When a board layout has been found it is printed out like this:
 ```
 [['U', '_', 'U', 'O', 'F'],
  ['M', 'P', 'O', 'U', 'O'],
@@ -55,7 +55,7 @@ If you would make this board layout in the actual game it would look like this:
 
 The solution is also saved in a log file:
 ```
-quad--119--405_22_20_00_41--14_06--07_00_25_19_16_00_20_12_20--capi_cong_hall_park_ward.log
+quad--119--405_22_20_00000_41--14_06--07_00_25_19_16_00_20_12_20--capi_cong_hall_park_ward.log
 ```
 The filename contains the VP total, counts of all building types, produced population and energy, points for all building types and used expansion tiles.
 
