@@ -22,7 +22,7 @@
 ## Office Towers                     33344 17 17 Office Towers
 ## Monuments                         01111  4  4 Monuments
 
-## types and distribution used for calculation
+## types and distribution used in calculation
 ## T Tower Blocks (+2 population)       8
 ## S Shops                              4
 ## U Public Services (+1 VP)            5
@@ -38,10 +38,12 @@
 ## O Office Towers                      8
 ## M Monuments                          M
 
+## types and distribution automatically added but manually changed letter code
+## U -> B Public Services (+2 VP)       2
+
 ## types and distribution for manual finetuning
-## Tower Blocks (+3 pop) extra_pop +1   1
-## Tower Blocks (+1 pop) extra_pop -1   1
-## U   -> B Public Services (+2 VP)     2
+## Tower Blocks (+3 pop) extrapop +1    1
+## Tower Blocks (+1 pop) extrapop -1    1
 
 from __future__ import print_function
 from __future__ import division
@@ -388,9 +390,10 @@ class Board:
             districts += b_is_public[ 2] or b_is_public[ 7] or b_is_public[12] or b_is_public[17]
             vptab_public = [0, 2, 5, 9, 14, 20]
             points = vptab_public[districts] + self.cnt_public - len(args.exp) + self.cnt_public * ('hall' in args.exp)
+            points += min(self.cnt_public - len(args.exp), 2)
             return points
         elif self.cnt_public == 1:
-            points = 3 - len(args.exp) + ('hall' in args.exp)
+            points = 4 - 2 * len(args.exp) + ('hall' in args.exp)
             return points
         return 0
 
