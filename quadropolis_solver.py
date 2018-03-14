@@ -98,8 +98,8 @@ class Board:
             ##    TSU_PG_FA_12345_OM
             ## tot845_32_23_32111_81
             ## min00E_00_00_00000_00
-            btypes =     ['T']*8+['S']*4+['U']*(5 - len(args.exp))+['P']*3+['G']*2+['F']*2+['A']*3+['1']*3+['2']*2+['3']*1+['4']*1+['5']*1+['O']*8+['M']*args.monuments
-            btypes_min = ['T']*0+['S']*0+['U']*len(args.exp)      +['P']*0+['G']*0+['F']*0+['A']*0+['1']*0+['2']*0+['3']*0+['4']*0+['5']*0+['O']*0+['M']*0
+            btypes =     ['T']*8+['S']*4+['U']*(5 - len(args.exp))+['P']*3+['G']*2+['F']*2+['A']*3+['1']*3+['2']*2+['3']*1+['4']*1+['5']*1+['O']*8+['M']*(-args.monuments if args.monuments < 0 else 0)
+            btypes_min = ['T']*0+['S']*0+['U']*len(args.exp)      +['P']*0+['G']*0+['F']*0+['A']*0+['1']*0+['2']*0+['3']*0+['4']*0+['5']*0+['O']*0+['M']*(args.monuments if args.monuments > 0 else 0)
             bpos = list(range(20))
             self.flat_b = ['_'] * 20
             self.flat_f = [1] * 20
@@ -773,7 +773,7 @@ parser = argparse.ArgumentParser(formatter_class=argparse.RawTextHelpFormatter)
 parser.add_argument('-mode', choices=['find', 'opti', 'tune'], default='find')
 parser.add_argument('-log')
 parser.add_argument('-exp', nargs='+', choices=['none', 'all1', 'all2', 'all3', 'all4', 'all5', 'max1', 'max2', 'max3', 'max4', 'max5', 'capi', 'cong', 'cust', 'elec', 'fire', 'hall', 'park', 'plan', 'poli', 'repr', 'scho', 'tvst', 'ward'], default=['max5'])
-parser.add_argument('-monuments', type=int, default=1)
+parser.add_argument('-monuments', type=int, default=-1)
 parser.add_argument('-extrapop', type=int, default=1)
 parser.add_argument('-minvp', type=int, default=108)
 parser.add_argument('-swapmin', type=int, default=66)
