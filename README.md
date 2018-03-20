@@ -6,20 +6,20 @@ I highly recommend using [PyPy](https://pypy.org) to run the script, it should b
 
 To get started simply run `pypy quadropolis_solver.py`. By default the script will generate board layouts of atleast 108 VP that use up to 5 random tiles of the Public Services expansion. When a board layout has been found it is printed out like this:
 ```
-[['U', '_', 'U', 'O', 'F'],
- ['M', 'P', 'O', 'U', 'O'],
- ['G', 'U', 'P', 'O', 'F'],
- ['T', 'G', 'T', 'U', '_']]
+[['T', 'P', 'T', '_', '_'],
+ ['U', 'M', 'G', 'U', '_'],
+ ['U', 'G', 'U', 'S', 'F'],
+ ['_', 'T', 'S', 'A', 'U']]
 [[1, 1, 1, 1, 1],
  [1, 1, 1, 1, 1],
  [1, 1, 1, 1, 1],
- [3, 1, 1, 1, 1]]
-expansion capi cong hall park ward
-pop 14 | 14 |  0 |  1
-ene  6 |  6 |  0
+ [1, 5, 1, 1, 1]]
+expansion capi fire hall poli ward
+pop 20 | 10 | 10 |  1
+ene  5 |  5 |  0
    Total Towe Shop Publ Park Fact Harb Offi Monu Expa
-cnt  20 |  4 |  0 |  5 |  4 |  2 |  0 |  4 |  1
-pts 119 |  7 |  0 | 25 | 19 | 16 |  0 | 20 | 12 | 20
+cnt  20 |  7 |  2 |  5 |  3 |  2 |  0 |  0 |  1
+pts 122 | 22 | 22 | 25 |  8 |  6 |  0 |  0 | 17 | 22
 ```
 
 You can use the following table to link the letter codes with the full building names. Note that for optimization reasons the variations of some buildings in the actual game are reduced (for example for Tower Blocks only the +2 population variant is used).
@@ -51,11 +51,11 @@ tvst TV Station
 ward Maternity Ward
 ```
 If you would make this board layout in the actual game it would look like this:
-![image of board layout](https://raw.githubusercontent.com/johandebock/quadropolis_solver/master/solutions_expansion_1monument/quad--119--405_22_20_00000_41--14_06--07_00_25_19_16_00_20_12_20--capi_cong_hall_park_ward.jpg)
+![image of board layout](https://raw.githubusercontent.com/johandebock/quadropolis_solver/master/solutions_expansion_1monument/quad--122--725_12_11_00000_01--20_05--22_22_25_08_06_00_00_17_22--capi_fire_hall_poli_ward.jpg)
 
 The solution is also saved in a log file:
 ```
-quad--119--405_22_20_00000_41--14_06--07_00_25_19_16_00_20_12_20--capi_cong_hall_park_ward.log
+quad--122--725_12_11_00000_01--20_05--22_22_25_08_06_00_00_17_22--capi_fire_hall_poli_ward.log
 ```
 The filename contains the VP total, counts of all building types, produced population and energy, points for all building types and used expansion tiles.
 
