@@ -25,7 +25,8 @@
 ## types and distribution used in calculation
 ## T Tower Blocks (+2 population)       8
 ## S Shops                              4
-## U Public Services (+1 VP)            5
+## U Public Services (+1 VP)            3
+## U Public Services (+2 VP)            2
 ## P Parks (-1 energy penalty)          3
 ## G Playgrounds (+1 population)        2
 ## F Factories (+3 energy)              2
@@ -37,9 +38,6 @@
 ## 5 Harbors (+2 energy)                1
 ## O Office Towers                      8
 ## M Monuments                          M
-
-## types and distribution automatically added but manually changed letter code
-## U -> B Public Services (+2 VP)       2
 
 ## types and distribution for manual finetuning
 ## Tower Blocks (+3 pop) extrapop +1    1
