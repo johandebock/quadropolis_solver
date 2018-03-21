@@ -188,7 +188,7 @@ class Board:
         self.nb_swaps = len(self.swaplist)
         self.cnt_swap = 0
 
-    def gen_board_string_calc_resources_counts_points(self, tune=False):
+    def gen_board_string_calc_resources_counts_points(self):
         """generate a string with 4x5 board, used expansion tiles, produced and used population and energy, counts of all buildings, points for all buildings
         for example:
         [['U', '_', 'U', 'O', 'F'],
@@ -206,13 +206,6 @@ class Board:
         cnt  20 |  4 |  0 |  5 |  4 |  2 |  0 |  4 |  1
         pts 119 |  7 |  0 | 25 | 19 | 16 |  0 | 20 | 12 | 20
         """
-        if tune:
-            list_B = []
-            for i in range(20):
-                if self.flat_b[i] == 'B':
-                    list_B.append(i)
-                    self.flat_b[i] = 'U'
-            self.flat2rect()
         self.calc_resources()
         self.cnt_T = self.cnt_S = self.cnt_U = self.cnt_P = self.cnt_G = self.cnt_F = self.cnt_A = self.cnt_1 = self.cnt_2 = self.cnt_3 = self.cnt_4 = self.cnt_5 = self.cnt_O = self.cnt_M = 0
         pop_norm = 0
@@ -264,11 +257,6 @@ class Board:
         self.pts_office = self.calc_points_office()
         self.pts_monument = self.calc_points_monument()
         self.pts_expansion = self.calc_points_expansion()
-        if tune:
-            self.pts_public += len(list_B)
-            for i in list_B:
-                self.flat_b[i] = 'B'
-            self.flat2rect()
         self.pts_total = self.pts_tower + self.pts_shop + self.pts_public + self.pts_park + self.pts_factory + self.pts_harbor + self.pts_office + self.pts_monument + self.pts_expansion
         return '{}\n{}\nexpansion {}\npop {:2} | {:2} | {:2} | {:2}\nene {:2} | {:2} | {:2}\n   Total Towe Shop Publ Park Fact Harb Offi Monu Expa\ncnt {:3} | {:2} | {:2} | {:2} | {:2} | {:2} | {:2} | {:2} | {:2}\npts {:3} | {:2} | {:2} | {:2} | {:2} | {:2} | {:2} | {:2} | {:2} | {:2}'.format(pprint.pformat(self.b, width=40), pprint.pformat(self.f, width=20), ' '.join(sorted(args.exp)), self.popula, self.popula_used, self.popula - self.popula_used, self.popula - pop_norm, self.energy, self.energy_used, self.energy - self.energy_used, self.cnt_total, self.cnt_T, self.cnt_S, self.cnt_U, self.cnt_P + self.cnt_G, self.cnt_F + self.cnt_A, self.cnt_1 + self.cnt_2 + self.cnt_3 + self.cnt_4 + self.cnt_5, self.cnt_O, self.cnt_M, self.pts_total, self.pts_tower, self.pts_shop, self.pts_public, self.pts_park, self.pts_factory, self.pts_harbor, self.pts_office, self.pts_monument, self.pts_expansion)
 
@@ -773,7 +761,7 @@ class Board:
 
 ### main
 parser = argparse.ArgumentParser(formatter_class=argparse.RawTextHelpFormatter)
-parser.add_argument('-mode', choices=['find', 'opti', 'tune'], default='find')
+parser.add_argument('-mode', choices=['find', 'opti'], default='find')
 parser.add_argument('-log')
 parser.add_argument('-exp', nargs='+', choices=['none', 'all1', 'all2', 'all3', 'all4', 'all5', 'max1', 'max2', 'max3', 'max4', 'max5', 'capi', 'cong', 'cust', 'elec', 'fire', 'hall', 'park', 'plan', 'poli', 'repr', 'scho', 'tvst', 'ward'], default=['max5'])
 parser.add_argument('-monuments', type=int, default=-1)
@@ -919,29 +907,3 @@ elif args.mode == 'opti':
             print(max_bo_string, file=f)
     else:
         print('provide a log to optimize with -log')
-
-elif args.mode == 'tune':
-    if args.log:
-        with open(args.log, 'r') as f:
-            log = f.readlines()
-        b  = [str(x.strip().strip("'[]")) for x in log[0].split(',')[0:5]]
-        b += [str(x.strip().strip("'[]")) for x in log[1].split(',')[0:5]]
-        b += [str(x.strip().strip("'[]")) for x in log[2].split(',')[0:5]]
-        b += [str(x.strip().strip("'[]")) for x in log[3].split(',')[0:5]]
-        f  = [int(x.strip().strip("'[]")) for x in log[4].split(',')[0:5]]
-        f += [int(x.strip().strip("'[]")) for x in log[5].split(',')[0:5]]
-        f += [int(x.strip().strip("'[]")) for x in log[6].split(',')[0:5]]
-        f += [int(x.strip().strip("'[]")) for x in log[7].split(',')[0:5]]
-        args.exp = log[8].strip().split(' ')[1:]
-        extra_pop = int(log[9].split('|')[-1])
-        bo = Board(b, f, extra_pop)
-        bo_string = bo.gen_board_string_calc_resources_counts_points(tune=True)
-        print(bo_string)
-        print('pts all exp', bo.calc_points_all_expansions())
-        os.remove(args.log)
-        filename = bo.gen_filename()
-        print('writing to {}'.format(filename))
-        with open(filename, 'w') as f:
-            print(bo_string, file=f)
-    else:
-        print('provide a log to finetune with -log')
