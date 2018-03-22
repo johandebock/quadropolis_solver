@@ -94,45 +94,49 @@ class Board:
             args.exp = random.sample(exp_choices, random_exp)
         elif random_exp < 0:
             args.exp = random.sample(exp_choices, random.randint(0, -random_exp))
+        btypes_str = 'T'*8+'S'*4+'U'*(5 - len(args.exp))+'P'*3+'G'*2+'F'*2+'A'*3+'1'*3+'2'*2+'3'*1+'4'*1+'5'*1+'O'*8+'M'*(-args.monuments if args.monuments < 0 else 0)
+        btypes_min_str = 'T'*0+'S'*0+'U'*len(args.exp)+'P'*0+'G'*0+'F'*0+'A'*0+'1'*0+'2'*0+'3'*0+'4'*0+'5'*0+'O'*0+'M'*(args.monuments if args.monuments > 0 else 0)
+        len_min = len(btypes_min_str)
         while True:
             ##    TSU_PG_FA_12345_OM
             ## tot845_32_23_32111_81
             ## min00E_00_00_00000_00
-            btypes =     ['T']*8+['S']*4+['U']*(5 - len(args.exp))+['P']*3+['G']*2+['F']*2+['A']*3+['1']*3+['2']*2+['3']*1+['4']*1+['5']*1+['O']*8+['M']*(-args.monuments if args.monuments < 0 else 0)
-            btypes_min = ['T']*0+['S']*0+['U']*len(args.exp)      +['P']*0+['G']*0+['F']*0+['A']*0+['1']*0+['2']*0+['3']*0+['4']*0+['5']*0+['O']*0+['M']*(args.monuments if args.monuments > 0 else 0)
             bpos = list(range(20))
-            self.flat_b = ['_'] * 20
+            self.flat_b = list('____________________')
             self.flat_f = [1] * 20
             cnt_b = 0
-            len_min = len(btypes_min)
+            btypes_min = list(btypes_min_str)
+            random.shuffle(btypes_min)
             while cnt_b < len_min:
                 s_bpos = random.choice(bpos)
                 c_bding = self.flat_b[s_bpos]
                 if c_bding == 'T' or c_bding == 'O':
-                    if self.flat_f[s_bpos] < 5:
-                        if c_bding in btypes_min:
-                            btypes_min.remove(c_bding)
-                            cnt_b += 1
-                            self.flat_f[s_bpos] += 1
+                    if self.flat_f[s_bpos] < 5 and c_bding in btypes_min:
+                        btypes_min.remove(c_bding)
+                        cnt_b += 1
+                        self.flat_f[s_bpos] += 1
+                    else:
+                        bpos.remove(s_bpos)
                 else:
-                    s_bding = random.choice(btypes_min)
-                    btypes_min.remove(s_bding)
+                    s_bding = btypes_min.pop()
                     cnt_b += 1
                     self.flat_b[s_bpos] = s_bding
                     if s_bding != 'T' and s_bding != 'O':
                         bpos.remove(s_bpos)
+            btypes = list(btypes_str)
+            random.shuffle(btypes)
             while cnt_b < 20:
                 s_bpos = random.choice(bpos)
                 c_bding = self.flat_b[s_bpos]
                 if c_bding == 'T' or c_bding == 'O':
-                    if self.flat_f[s_bpos] < 5:
-                        if c_bding in btypes:
-                            btypes.remove(c_bding)
-                            cnt_b += 1
-                            self.flat_f[s_bpos] += 1
+                    if self.flat_f[s_bpos] < 5 and c_bding in btypes:
+                        btypes.remove(c_bding)
+                        cnt_b += 1
+                        self.flat_f[s_bpos] += 1
+                    else:
+                        bpos.remove(s_bpos)
                 else:
-                    s_bding = random.choice(btypes)
-                    btypes.remove(s_bding)
+                    s_bding = btypes.pop()
                     cnt_b += 1
                     self.flat_b[s_bpos] = s_bding
                     if s_bding != 'T' and s_bding != 'O':
