@@ -1,0 +1,14 @@
+[['3', '2', '2', '1', '1'],
+ ['_', 'U', 'T', 'U', '_'],
+ ['U', 'M', 'G', 'M', 'U'],
+ ['_', 'G', 'U', 'S', '_']]
+[[1, 1, 1, 1, 1],
+ [1, 1, 5, 1, 1],
+ [1, 1, 1, 1, 1],
+ [1, 1, 1, 1, 1]]
+expansion capi cust hall poli ward
+pop 17 | 12 |  5 |  0
+ene  2 |  2 |  0
+   Total Towe Shop Publ Park Fact Harb Offi Monu Expa
+cnt  20 |  5 |  1 |  5 |  2 |  0 |  5 |  0 |  2
+pts 127 | 20 | 11 | 25 |  2 |  0 | 30 |  0 | 26 | 13
