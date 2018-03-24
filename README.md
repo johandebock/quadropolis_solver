@@ -51,11 +51,11 @@ tvst TV Station
 ward Maternity Ward
 ```
 If you would make this board layout in the actual game it would look like this:
-![image of board layout](https://raw.githubusercontent.com/johandebock/quadropolis_solver/master/solutions_expansion_1monument/quad--122--725_12_11_00000_01--20_05--22_22_25_08_06_00_00_17_22--capi_fire_hall_poli_ward.jpg)
+![image of board layout](https://raw.githubusercontent.com/johandebock/quadropolis_solver/master/solutions_expansion_1monument/quad--123--725_02_11_00100_01--20_05--22_22_25_08_12_03_00_12_19--capi_hall_plan_poli_ward.jpg)
 
 The solution is also saved in a log file:
 ```
-quad--122--725_12_11_00000_01--20_05--22_22_25_08_06_00_00_17_22--capi_fire_hall_poli_ward.log
+quad--123--725_02_11_00100_01--20_05--22_22_25_08_12_03_00_12_19--capi_hall_plan_poli_ward.log
 ```
 The filename contains the VP total, counts of all building types, produced population and energy, points for all building types and used expansion tiles.
 
@@ -63,18 +63,14 @@ You can find more already generated optimal board layouts in the solutions_* fol
 
 Here are a few other high VP board layouts:
 ```
+quad--122--725_12_11_00000_01--20_05--22_22_25_08_06_00_00_17_22--capi_fire_hall_poli_ward.log
+```
+![image of board layout](https://raw.githubusercontent.com/johandebock/quadropolis_solver/master/solutions_expansion_1monument/quad--122--725_12_11_00000_01--20_05--22_22_25_08_06_00_00_17_22--capi_fire_hall_poli_ward.jpg)
+```
+quad--122--825_21_10_00000_01--18_06--27_22_25_13_04_00_00_15_16--capi_elec_hall_poli_scho.log
+```
+![image of board layout](https://raw.githubusercontent.com/johandebock/quadropolis_solver/master/solutions_expansion_1monument/quad--122--825_21_10_00000_01--18_06--27_22_25_13_04_00_00_15_16--capi_elec_hall_poli_scho.jpg)
+```
 quad--122--835_01_11_00000_01--24_05--26_33_25_04_08_00_00_13_13--capi_hall_poli_tvst_ward.log
 ```
 ![image of board layout](https://raw.githubusercontent.com/johandebock/quadropolis_solver/master/solutions_expansion_1monument/quad--122--835_01_11_00000_01--24_05--26_33_25_04_08_00_00_13_13--capi_hall_poli_tvst_ward.jpg)
-```
-quad--121--625_12_02_00010_01--20_04--21_22_25_08_12_00_00_13_20--capi_hall_plan_poli_ward.log
-```
-![image of board layout](https://raw.githubusercontent.com/johandebock/quadropolis_solver/master/solutions_expansion_1monument/quad--121--625_12_02_00010_01--20_04--21_22_25_08_12_00_00_13_20--capi_hall_plan_poli_ward.jpg)
-```
-quad--121--725_12_02_00000_01--20_04--23_22_25_06_06_00_00_17_22--capi_fire_hall_poli_ward.log
-```
-![image of board layout](https://raw.githubusercontent.com/johandebock/quadropolis_solver/master/solutions_expansion_1monument/quad--121--725_12_02_00000_01--20_04--23_22_25_06_06_00_00_17_22--capi_fire_hall_poli_ward.jpg)
-```
-quad--121--825_12_10_00000_01--18_06--27_22_25_12_04_00_00_13_18--capi_elec_hall_poli_scho.log
-```
-![image of board layout](https://raw.githubusercontent.com/johandebock/quadropolis_solver/master/solutions_expansion_1monument/quad--121--825_12_10_00000_01--18_06--27_22_25_12_04_00_00_13_18--capi_elec_hall_poli_scho.jpg)
