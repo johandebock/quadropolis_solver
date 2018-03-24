@@ -56,34 +56,26 @@ import time
 random_exp = 0
 exp_choices = ['capi', 'cong', 'cust', 'elec', 'fire', 'hall', 'park', 'plan', 'poli', 'repr', 'scho', 'tvst', 'ward']
 
-def floodfill(im, start_ij):
+def floodfill(im, start_i):
     """flood fill function for Office Tower point calculation
     """
-    visited = {start_ij}
-    queue = [start_ij]
+    visited = {start_i}
+    queue = [start_i]
     while queue:
-        (i, j) = queue.pop(0)
-        neighbors = []
-        neighbors.append((i, j - 1))
-        neighbors.append((i, j + 1))
-        neighbors.append((i - 1, j))
-        neighbors.append((i + 1, j))
-        for ij in neighbors:
-            if ij not in visited and im[ij[0]][ij[1]]:
-                visited |= {ij}
-                queue.append(ij)
+        i = queue.pop(-1)
+        for n in (i + 1, i + 7, i - 1, i - 7):
+            if n not in visited and im[n]:
+                visited |= {n}
+                queue.append(n)
     return visited
 
 class Board:
     def __init__(self, b=['_'] * 20, f=[1] * 20, extra_pop=0):
         """initialise a 4x5 board
         """
-        self.flat_b = b
-        self.flat_f = f
-        self.b = [['_'] * 5] * 4
-        self.f = [[1] * 5] * 4
+        self.b = b
+        self.f = f
         self.extra_pop = extra_pop
-        self.flat2rect()
 
     def random_valid(self):
         """generate a valid board with 20 buildings
@@ -97,66 +89,53 @@ class Board:
         btypes_str = 'T'*8+'S'*4+'U'*(5 - len(args.exp))+'P'*3+'G'*2+'F'*2+'A'*3+'1'*3+'2'*2+'3'*1+'4'*1+'5'*1+'O'*8+'M'*(-args.monuments if args.monuments < 0 else 0)
         btypes_min_str = 'T'*0+'S'*0+'U'*len(args.exp)+'P'*0+'G'*0+'F'*0+'A'*0+'1'*0+'2'*0+'3'*0+'4'*0+'5'*0+'O'*0+'M'*(args.monuments if args.monuments > 0 else 0)
         len_min = len(btypes_min_str)
-        while True:
+        while 1:
             ##    TSU_PG_FA_12345_OM
             ## tot845_32_23_32111_81
             ## min00E_00_00_00000_00
             bpos = list(range(20))
-            self.flat_b = list('____________________')
-            self.flat_f = [1] * 20
+            self.b = ['_'] * 20
+            self.f = [1] * 20
             cnt_b = 0
             btypes_min = list(btypes_min_str)
             random.shuffle(btypes_min)
             while cnt_b < len_min:
                 s_bpos = random.choice(bpos)
-                c_bding = self.flat_b[s_bpos]
+                c_bding = self.b[s_bpos]
                 if c_bding == 'T' or c_bding == 'O':
-                    if self.flat_f[s_bpos] < 5 and c_bding in btypes_min:
+                    if self.f[s_bpos] < 5 and c_bding in btypes_min:
                         btypes_min.remove(c_bding)
                         cnt_b += 1
-                        self.flat_f[s_bpos] += 1
+                        self.f[s_bpos] += 1
                     else:
                         bpos.remove(s_bpos)
                 else:
-                    s_bding = btypes_min.pop()
+                    s_bding = btypes_min.pop(-1)
                     cnt_b += 1
-                    self.flat_b[s_bpos] = s_bding
+                    self.b[s_bpos] = s_bding
                     if s_bding != 'T' and s_bding != 'O':
                         bpos.remove(s_bpos)
             btypes = list(btypes_str)
             random.shuffle(btypes)
             while cnt_b < 20:
                 s_bpos = random.choice(bpos)
-                c_bding = self.flat_b[s_bpos]
+                c_bding = self.b[s_bpos]
                 if c_bding == 'T' or c_bding == 'O':
-                    if self.flat_f[s_bpos] < 5 and c_bding in btypes:
+                    if self.f[s_bpos] < 5 and c_bding in btypes:
                         btypes.remove(c_bding)
                         cnt_b += 1
-                        self.flat_f[s_bpos] += 1
+                        self.f[s_bpos] += 1
                     else:
                         bpos.remove(s_bpos)
                 else:
-                    s_bding = btypes.pop()
+                    s_bding = btypes.pop(-1)
                     cnt_b += 1
-                    self.flat_b[s_bpos] = s_bding
+                    self.b[s_bpos] = s_bding
                     if s_bding != 'T' and s_bding != 'O':
                         bpos.remove(s_bpos)
             self.calc_resources()
             if self.popula_used <= self.popula and self.energy_used <= self.energy:
-                self.flat2rect()
                 break
-
-    def flat2rect(self):
-        """copy 1d array (is faster) to matrix (for neighborhood calculations)
-        """
-        self.b[0] = self.flat_b[ 0: 5]
-        self.b[1] = self.flat_b[ 5:10]
-        self.b[2] = self.flat_b[10:15]
-        self.b[3] = self.flat_b[15:20]
-        self.f[0] = self.flat_f[ 0: 5]
-        self.f[1] = self.flat_f[ 5:10]
-        self.f[2] = self.flat_f[10:15]
-        self.f[3] = self.flat_f[15:20]
 
     def swap(self):
         """swap every combination of 2 elements in matrix
@@ -166,27 +145,26 @@ class Board:
         if self.cnt_swap == 0:
             i = self.swaplist[self.cnt_swap][0]
             j = self.swaplist[self.cnt_swap][1]
-            self.flat_b[i], self.flat_b[j] = self.flat_b[j], self.flat_b[i]
-            self.flat_f[i], self.flat_f[j] = self.flat_f[j], self.flat_f[i]
+            self.b[i], self.b[j] = self.b[j], self.b[i]
+            self.f[i], self.f[j] = self.f[j], self.f[i]
         elif self.cnt_swap < self.nb_swaps:
             i = self.swaplist[self.cnt_swap - 1][0]
             j = self.swaplist[self.cnt_swap - 1][1]
-            self.flat_b[i], self.flat_b[j] = self.flat_b[j], self.flat_b[i]
-            self.flat_f[i], self.flat_f[j] = self.flat_f[j], self.flat_f[i]
+            self.b[i], self.b[j] = self.b[j], self.b[i]
+            self.f[i], self.f[j] = self.f[j], self.f[i]
             i = self.swaplist[self.cnt_swap][0]
             j = self.swaplist[self.cnt_swap][1]
-            self.flat_b[i], self.flat_b[j] = self.flat_b[j], self.flat_b[i]
-            self.flat_f[i], self.flat_f[j] = self.flat_f[j], self.flat_f[i]
+            self.b[i], self.b[j] = self.b[j], self.b[i]
+            self.f[i], self.f[j] = self.f[j], self.f[i]
         else:
-            return False
-        self.flat2rect()
+            return 0
         self.cnt_swap += 1
-        return True
+        return 1
 
     def swap_init(self):
         """swap initialisation
         """
-        self.swaplist = [x for x in itertools.combinations(range(20), 2)]
+        self.swaplist = tuple(x for x in itertools.combinations(range(20), 2))
         self.nb_swaps = len(self.swaplist)
         self.cnt_swap = 0
 
@@ -212,10 +190,10 @@ class Board:
         self.cnt_T = self.cnt_S = self.cnt_U = self.cnt_P = self.cnt_G = self.cnt_F = self.cnt_A = self.cnt_1 = self.cnt_2 = self.cnt_3 = self.cnt_4 = self.cnt_5 = self.cnt_O = self.cnt_M = 0
         pop_norm = 0
         for i in range(20):
-            b = self.flat_b[i]
+            b = self.b[i]
             if b == 'T':
-                self.cnt_T += self.flat_f[i]
-                pop_norm += self.flat_f[i] * 2
+                self.cnt_T += self.f[i]
+                pop_norm += self.f[i] * 2
             elif b == 'S':
                 self.cnt_S += 1
             elif b == 'U':
@@ -242,7 +220,7 @@ class Board:
             elif b == '5':
                 self.cnt_5 += 1
             elif b == 'O':
-                self.cnt_O += self.flat_f[i]
+                self.cnt_O += self.f[i]
             elif b == 'M':
                 self.cnt_M += 1
         if 'tvst' in args.exp:
@@ -260,7 +238,17 @@ class Board:
         self.pts_monument = self.calc_points_monument()
         self.pts_expansion = self.calc_points_expansion()
         self.pts_total = self.pts_tower + self.pts_shop + self.pts_public + self.pts_park + self.pts_factory + self.pts_harbor + self.pts_office + self.pts_monument + self.pts_expansion
-        return '{}\n{}\nexpansion {}\npop {:2} | {:2} | {:2} | {:2}\nene {:2} | {:2} | {:2}\n   Total Towe Shop Publ Park Fact Harb Offi Monu Expa\ncnt {:3} | {:2} | {:2} | {:2} | {:2} | {:2} | {:2} | {:2} | {:2}\npts {:3} | {:2} | {:2} | {:2} | {:2} | {:2} | {:2} | {:2} | {:2} | {:2}'.format(pprint.pformat(self.b, width=40), pprint.pformat(self.f, width=20), ' '.join(sorted(args.exp)), self.popula, self.popula_used, self.popula - self.popula_used, self.popula - pop_norm, self.energy, self.energy_used, self.energy - self.energy_used, self.cnt_total, self.cnt_T, self.cnt_S, self.cnt_U, self.cnt_P + self.cnt_G, self.cnt_F + self.cnt_A, self.cnt_1 + self.cnt_2 + self.cnt_3 + self.cnt_4 + self.cnt_5, self.cnt_O, self.cnt_M, self.pts_total, self.pts_tower, self.pts_shop, self.pts_public, self.pts_park, self.pts_factory, self.pts_harbor, self.pts_office, self.pts_monument, self.pts_expansion)
+        rb = [[]] * 4
+        rb[0] = self.b[ 0: 5]
+        rb[1] = self.b[ 5:10]
+        rb[2] = self.b[10:15]
+        rb[3] = self.b[15:20]
+        rf = [[]] * 4
+        rf[0] = self.f[ 0: 5]
+        rf[1] = self.f[ 5:10]
+        rf[2] = self.f[10:15]
+        rf[3] = self.f[15:20]
+        return '{}\n{}\nexpansion {}\npop {:2} | {:2} | {:2} | {:2}\nene {:2} | {:2} | {:2}\n   Total Towe Shop Publ Park Fact Harb Offi Monu Expa\ncnt {:3} | {:2} | {:2} | {:2} | {:2} | {:2} | {:2} | {:2} | {:2}\npts {:3} | {:2} | {:2} | {:2} | {:2} | {:2} | {:2} | {:2} | {:2} | {:2}'.format(pprint.pformat(rb, width=40), pprint.pformat(rf, width=20), ' '.join(sorted(args.exp)), self.popula, self.popula_used, self.popula - self.popula_used, self.popula - pop_norm, self.energy, self.energy_used, self.energy - self.energy_used, self.cnt_total, self.cnt_T, self.cnt_S, self.cnt_U, self.cnt_P + self.cnt_G, self.cnt_F + self.cnt_A, self.cnt_1 + self.cnt_2 + self.cnt_3 + self.cnt_4 + self.cnt_5, self.cnt_O, self.cnt_M, self.pts_total, self.pts_tower, self.pts_shop, self.pts_public, self.pts_park, self.pts_factory, self.pts_harbor, self.pts_office, self.pts_monument, self.pts_expansion)
 
     def gen_filename(self):
         """generate a filename with total points, counts of all buildings, produced population and energy, points for all buildings, used expansion tiles
@@ -281,14 +269,14 @@ class Board:
         self.cnt_public = self.cnt_shop = self.cnt_1 = self.cnt_2 = self.cnt_3 = self.cnt_4 = self.cnt_5 = self.cnt_office = 0
         self.popula += self.extra_pop
         for i in range(20):
-            b = self.flat_b[i]
+            b = self.b[i]
             if b == 'T':
-                self.popula += self.flat_f[i] * 2
+                self.popula += self.f[i] * 2
                 self.energy_used += 1
             elif b == 'O':
                 self.popula_used += 1
                 self.energy_used += 1
-                self.cnt_office += self.flat_f[i]
+                self.cnt_office += self.f[i]
             elif b == 'U':
                 self.popula_used += 1
                 self.cnt_public += 1
@@ -340,15 +328,15 @@ class Board:
 
         unchanged while swapping buildings on board
         """
-        vptab_tower = [0, 1, 3, 6, 10, 15]
         points = 0
         cnt_tower = 0
+        vptab_tower = (0, 1, 3, 6, 10, 15)
         for i in range(20):
-            if self.flat_b[i] == 'T':
-                points += vptab_tower[self.flat_f[i]]
+            if self.b[i] == 'T':
+                points += vptab_tower[self.f[i]]
                 cnt_tower += 1
         if 'poli' in args.exp:
-            points += max(self.flat_f)
+            points += max(self.f)
         if 'scho' in args.exp:
             points += cnt_tower
         return points
@@ -358,10 +346,10 @@ class Board:
 
         unchanged while swapping buildings on board
         """
-        rem_pop = max(self.popula - self.popula_used, 0)
-        points = min(self.cnt_shop, int(rem_pop / 5)) * 11
-        rem_shop = self.cnt_shop - int(rem_pop / 5)
-        vptab_shop = [0, 1, 2, 4, 7]
+        rem_pop = self.popula - self.popula_used
+        points = min(self.cnt_shop, rem_pop // 5) * 11
+        rem_shop = self.cnt_shop - rem_pop // 5
+        vptab_shop = (0, 1, 2, 4, 7)
         if rem_shop > 0:
             points += vptab_shop[rem_pop % 5]
         penalty_popula = max(rem_pop - self.cnt_shop * 5, 0)
@@ -372,13 +360,13 @@ class Board:
         """calculate Public Service and City Hall points
         """
         if self.cnt_public >= 2:
-            b_is_public = [x == 'U' for x in self.flat_b]
-            districts  = b_is_public[ 0] or b_is_public[ 1] or b_is_public[ 5] or b_is_public[ 6]
-            districts += b_is_public[10] or b_is_public[11] or b_is_public[15] or b_is_public[16]
-            districts += b_is_public[ 3] or b_is_public[ 4] or b_is_public[ 8] or b_is_public[ 9]
-            districts += b_is_public[13] or b_is_public[14] or b_is_public[18] or b_is_public[19]
-            districts += b_is_public[ 2] or b_is_public[ 7] or b_is_public[12] or b_is_public[17]
-            vptab_public = [0, 2, 5, 9, 14, 20]
+            nb_public_in_district = [0, 0, 0, 0, 0]
+            i_to_district = (0, 0, 1, 2, 2, 0, 0, 1, 2, 2, 3, 3, 1, 4, 4, 3, 3, 1, 4, 4)
+            for i in range(20):
+                if self.b[i] == 'U':
+                    nb_public_in_district[i_to_district[i]] += 1
+            districts = len([1 for x in nb_public_in_district if x > 0])
+            vptab_public = (0, 2, 5, 9, 14, 20)
             points = vptab_public[districts] + self.cnt_public - len(args.exp) + self.cnt_public * ('hall' in args.exp)
             points += min(self.cnt_public - len(args.exp), 2)
             return points
@@ -390,33 +378,34 @@ class Board:
     def calc_points_park(self):
         """calculate Park, Park District and Reprocessing Plant points
         """
-        vptab_park = [0, 2, 4, 7, 11]
-        be = [[]] * 6
-        be[0] = ['_'] * 7
-        be[1] = ['_'] + self.b[0] + ['_']
-        be[2] = ['_'] + self.b[1] + ['_']
-        be[3] = ['_'] + self.b[2] + ['_']
-        be[4] = ['_'] + self.b[3] + ['_']
-        be[5] = ['_'] * 7
+        be = ['_'] * 8
+        be += self.b[ 0: 5]
+        be += ['_'] * 2
+        be += self.b[ 5:10]
+        be += ['_'] * 2
+        be += self.b[10:15]
+        be += ['_'] * 2
+        be += self.b[15:20]
+        be += ['_'] * 8
         cnt_PG = 0
         cnt_P = 0
         points = 0
-        for i in range(1, 5):
-            for j in range(1, 6):
-                if be[i][j] == 'P' or be[i][j] == 'G':
-                    cnt_PG += 1
-                    if be[i][j] == 'P':
-                        cnt_P += 1
-                    neigh_tower_office = 0
-                    if be[i][j - 1] == 'T' or be[i][j - 1] == 'O':
-                        neigh_tower_office += 1
-                    if be[i][j + 1] == 'T' or be[i][j + 1] == 'O':
-                        neigh_tower_office += 1
-                    if be[i - 1][j] == 'T' or be[i - 1][j] == 'O':
-                        neigh_tower_office += 1
-                    if be[i + 1][j] == 'T' or be[i + 1][j] == 'O':
-                        neigh_tower_office += 1
-                    points += vptab_park[neigh_tower_office]
+        vptab_park = (0, 2, 4, 7, 11)
+        for i in range(8, 34):
+            if be[i] == 'P' or be[i] == 'G':
+                cnt_PG += 1
+                if be[i] == 'P':
+                    cnt_P += 1
+                neigh_tower_office = 0
+                if be[i - 1] == 'T' or be[i - 1] == 'O':
+                    neigh_tower_office += 1
+                if be[i + 1] == 'T' or be[i + 1] == 'O':
+                    neigh_tower_office += 1
+                if be[i - 7] == 'T' or be[i - 7] == 'O':
+                    neigh_tower_office += 1
+                if be[i + 7] == 'T' or be[i + 7] == 'O':
+                    neigh_tower_office += 1
+                points += vptab_park[neigh_tower_office]
         if 'park' in args.exp:
             points += cnt_PG
         if 'repr' in args.exp:
@@ -430,41 +419,42 @@ class Board:
     def calc_points_factory(self):
         """calculate Factory points
         """
-        be = [[]] * 6
-        be[0] = ['_'] * 7
-        be[1] = ['_'] + self.b[0] + ['_']
-        be[2] = ['_'] + self.b[1] + ['_']
-        be[3] = ['_'] + self.b[2] + ['_']
-        be[4] = ['_'] + self.b[3] + ['_']
-        be[5] = ['_'] * 7
+        be = ['_'] * 8
+        be += self.b[ 0: 5]
+        be += ['_'] * 2
+        be += self.b[ 5:10]
+        be += ['_'] * 2
+        be += self.b[10:15]
+        be += ['_'] * 2
+        be += self.b[15:20]
+        be += ['_'] * 8
         points = 0
-        for i in range(1, 5):
-            for j in range(1, 6):
-                if be[i][j] == 'A' or be[i][j] == 'F':
-                    if be[i][j - 1] == 'O':
-                        points += 4
-                    elif ord(be[i][j - 1]) < 54:
-                        points += 3
-                    elif be[i][j - 1] == 'S':
-                        points += 2
-                    if be[i][j + 1] == 'O':
-                        points += 4
-                    elif ord(be[i][j + 1]) < 54:
-                        points += 3
-                    elif be[i][j + 1] == 'S':
-                        points += 2
-                    if be[i - 1][j] == 'O':
-                        points += 4
-                    elif ord(be[i - 1][j]) < 54:
-                        points += 3
-                    elif be[i - 1][j] == 'S':
-                        points += 2
-                    if be[i + 1][j] == 'O':
-                        points += 4
-                    elif ord(be[i + 1][j]) < 54:
-                        points += 3
-                    elif be[i + 1][j] == 'S':
-                        points += 2
+        for i in range(8, 34):
+            if be[i] == 'A' or be[i] == 'F':
+                if be[i - 1] == 'O':
+                    points += 4
+                elif ord(be[i - 1]) < 54:
+                    points += 3
+                elif be[i - 1] == 'S':
+                    points += 2
+                if be[i + 1] == 'O':
+                    points += 4
+                elif ord(be[i + 1]) < 54:
+                    points += 3
+                elif be[i + 1] == 'S':
+                    points += 2
+                if be[i - 7] == 'O':
+                    points += 4
+                elif ord(be[i - 7]) < 54:
+                    points += 3
+                elif be[i - 7] == 'S':
+                    points += 2
+                if be[i + 7] == 'O':
+                    points += 4
+                elif ord(be[i + 7]) < 54:
+                    points += 3
+                elif be[i + 7] == 'S':
+                    points += 2
         return points
 
     def calc_points_harbor(self):
@@ -475,31 +465,31 @@ class Board:
             hor = 0
             for i in range(4):
                 j = 0
-                while j < 5 and ord(self.b[i][j]) >= 54:
+                while j < 5 and ord(self.b[i * 5 + j]) >= 54:
                     j += 1
                 if j < 4:
                     start = j
                     j += 1
-                    while j < 5 and ord(self.b[i][j]) < 54:
+                    while j < 5 and ord(self.b[i * 5 + j]) < 54:
                         j += 1
-                    len = j - start
-                    if len > hor:
-                        hor = len
-            vptab_harbor = [0, 0, 3, 7, 12, 18]
+                    length = j - start
+                    if length > hor:
+                        hor = length
+            vptab_harbor = (0, 0, 3, 7, 12, 18)
             points += vptab_harbor[hor]
             ver = 0
             for j in range(5):
                 i = 0
-                while i < 4 and ord(self.b[i][j]) >= 54:
+                while i < 4 and ord(self.b[i * 5 + j]) >= 54:
                     i += 1
                 if i < 3:
                     start = i
                     i += 1
-                    while i < 4 and ord(self.b[i][j]) < 54:
+                    while i < 4 and ord(self.b[i * 5 + j]) < 54:
                         i += 1
-                    len = i - start
-                    if len > ver:
-                        ver = len
+                    length = i - start
+                    if length > ver:
+                        ver = length
             points += vptab_harbor[ver]
             if 'cust' in args.exp:
                 if ver == 4 or hor == 5:
@@ -510,110 +500,120 @@ class Board:
     def calc_points_office(self):
         """calculate Office Tower and Congress Center points
         """
-        vptab_office = [
-            [0, 0, 0,  0,  0,  0],
-            [0, 0, 1,  3,  6, 10],
-            [0, 1, 3,  6, 10, 15],
-            [0, 2, 5,  9, 14, 20],
-            [0, 3, 7, 12, 18, 25],
-            [0, 4, 9, 15, 22, 30]
-        ]
         if 'cong' in args.exp:
             if self.cnt_office >= 1:
-                be = [[]] * 6
-                be[0] = [False] * 7
-                be[1] = [False] + [x == 'O' for x in self.b[0]] + [False]
-                be[2] = [False] + [x == 'O' for x in self.b[1]] + [False]
-                be[3] = [False] + [x == 'O' for x in self.b[2]] + [False]
-                be[4] = [False] + [x == 'O' for x in self.b[3]] + [False]
-                be[5] = [False] * 7
+                be = [0] * 8
+                be += [1 if x == 'O' else 0 for x in self.b[ 0: 5]]
+                be += [0] * 2
+                be += [1 if x == 'O' else 0 for x in self.b[ 5:10]]
+                be += [0] * 2
+                be += [1 if x == 'O' else 0 for x in self.b[10:15]]
+                be += [0] * 2
+                be += [1 if x == 'O' else 0 for x in self.b[15:20]]
+                be += [0] * 8
                 max_points = 0
-                for bi in range(4):
-                    for bj in range(5):
-                        if self.b[bi][bj] == 'U':
-                            be[bi + 1][bj + 1] = True
-                            total_visited = set()
-                            points = 0
-                            for i in range(1, 5):
-                                for j in range(1, 6):
-                                    if be[i][j] and (i, j) not in total_visited:
-                                        visited = floodfill(be, (i, j))
-                                        total_visited |= visited
-                                        adj = min(len(visited), 5)
-                                        for vij in visited:
-                                            points += vptab_office[adj][self.f[vij[0] - 1][vij[1] - 1]]
-                            if points > max_points:
-                                max_points = points
-                            be[bi + 1][bj + 1] = False
+                vptab_office = (
+                    (0, 0, 0,  0,  0,  0),
+                    (0, 0, 1,  3,  6, 10),
+                    (0, 1, 3,  6, 10, 15),
+                    (0, 2, 5,  9, 14, 20),
+                    (0, 3, 7, 12, 18, 25),
+                    (0, 4, 9, 15, 22, 30)
+                )
+                for bi in range(20):
+                    if self.b[bi] == 'U':
+                        be[(bi // 5 + 1) * 7 + bi % 5 + 1] = 1
+                        total_visited = set()
+                        points = 0
+                        for i in range(8, 34):
+                            if be[i] and i not in total_visited:
+                                visited = floodfill(be, i)
+                                total_visited |= visited
+                                adj = min(len(visited), 5)
+                                for vi in visited:
+                                    points += vptab_office[adj][self.f[(vi // 7 - 1) * 5 + vi % 7 - 1]]
+                        if points > max_points:
+                            max_points = points
+                        be[(bi // 5 + 1) * 7 + bi % 5 + 1] = 0
                 return max_points
         else:
             if self.cnt_office >= 2:
-                be = [[]] * 6
-                be[0] = [False] * 7
-                be[1] = [False] + [x == 'O' for x in self.b[0]] + [False]
-                be[2] = [False] + [x == 'O' for x in self.b[1]] + [False]
-                be[3] = [False] + [x == 'O' for x in self.b[2]] + [False]
-                be[4] = [False] + [x == 'O' for x in self.b[3]] + [False]
-                be[5] = [False] * 7
-                total_visited = set()
+                be = [0] * 8
+                be += [1 if x == 'O' else 0 for x in self.b[ 0: 5]]
+                be += [0] * 2
+                be += [1 if x == 'O' else 0 for x in self.b[ 5:10]]
+                be += [0] * 2
+                be += [1 if x == 'O' else 0 for x in self.b[10:15]]
+                be += [0] * 2
+                be += [1 if x == 'O' else 0 for x in self.b[15:20]]
+                be += [0] * 8
                 points = 0
-                for i in range(1, 5):
-                    for j in range(1, 6):
-                        if be[i][j] and (i, j) not in total_visited:
-                            visited = floodfill(be, (i, j))
-                            total_visited |= visited
-                            adj = min(len(visited), 5)
-                            for ij in visited:
-                                points += vptab_office[adj][self.f[ij[0] - 1][ij[1] - 1]]
+                total_visited = set()
+                vptab_office = (
+                    (0, 0, 0,  0,  0,  0),
+                    (0, 0, 1,  3,  6, 10),
+                    (0, 1, 3,  6, 10, 15),
+                    (0, 2, 5,  9, 14, 20),
+                    (0, 3, 7, 12, 18, 25),
+                    (0, 4, 9, 15, 22, 30)
+                )
+                for i in range(8, 34):
+                    if be[i] and i not in total_visited:
+                        visited = floodfill(be, i)
+                        total_visited |= visited
+                        adj = min(len(visited), 5)
+                        for vi in visited:
+                            points += vptab_office[adj][self.f[(vi // 7 - 1) * 5 + vi % 7 - 1]]
                 return points
         return 0
 
     def calc_points_monument(self):
         """calculate Monument points
         """
-        be = [[]] * 6
-        be[0] = ['_'] * 7
-        be[1] = ['_'] + self.b[0] + ['_']
-        be[2] = ['_'] + self.b[1] + ['_']
-        be[3] = ['_'] + self.b[2] + ['_']
-        be[4] = ['_'] + self.b[3] + ['_']
-        be[5] = ['_'] * 7
+        be = ['_'] * 8
+        be += self.b[ 0: 5]
+        be += ['_'] * 2
+        be += self.b[ 5:10]
+        be += ['_'] * 2
+        be += self.b[10:15]
+        be += ['_'] * 2
+        be += self.b[15:20]
+        be += ['_'] * 8
         points = 0
-        for i in range(1, 5):
-            for j in range(1, 6):
-                if be[i][j] == 'M':
-                    if be[i][j - 1] == 'P' or be[i][j - 1] == 'G':
-                        points += 5
-                    elif be[i][j - 1] == 'S':
-                        points += 3
-                    elif be[i][j - 1] == 'U':
-                        points += 2
-                    elif be[i][j - 1] == 'A' or be[i][j - 1] == 'F' or ord(be[i][j - 1]) < 54:
-                        points -= 5
-                    if be[i][j + 1] == 'P' or be[i][j + 1] == 'G':
-                        points += 5
-                    elif be[i][j + 1] == 'S':
-                        points += 3
-                    elif be[i][j + 1] == 'U':
-                        points += 2
-                    elif be[i][j + 1] == 'A' or be[i][j + 1] == 'F' or ord(be[i][j + 1]) < 54:
-                        points -= 5
-                    if be[i - 1][j] == 'P' or be[i - 1][j] == 'G':
-                        points += 5
-                    elif be[i - 1][j] == 'S':
-                        points += 3
-                    elif be[i - 1][j] == 'U':
-                        points += 2
-                    elif be[i - 1][j] == 'A' or be[i - 1][j] == 'F' or ord(be[i - 1][j]) < 54:
-                        points -= 5
-                    if be[i + 1][j] == 'P' or be[i + 1][j] == 'G':
-                        points += 5
-                    elif be[i + 1][j] == 'S':
-                        points += 3
-                    elif be[i + 1][j] == 'U':
-                        points += 2
-                    elif be[i + 1][j] == 'A' or be[i + 1][j] == 'F' or ord(be[i + 1][j]) < 54:
-                        points -= 5
+        for i in range(8, 34):
+            if be[i] == 'M':
+                if be[i - 1] == 'P' or be[i - 1] == 'G':
+                    points += 5
+                elif be[i - 1] == 'S':
+                    points += 3
+                elif be[i - 1] == 'U':
+                    points += 2
+                elif be[i - 1] == 'A' or be[i - 1] == 'F' or ord(be[i - 1]) < 54:
+                    points -= 5
+                if be[i + 1] == 'P' or be[i + 1] == 'G':
+                    points += 5
+                elif be[i + 1] == 'S':
+                    points += 3
+                elif be[i + 1] == 'U':
+                    points += 2
+                elif be[i + 1] == 'A' or be[i + 1] == 'F' or ord(be[i + 1]) < 54:
+                    points -= 5
+                if be[i - 7] == 'P' or be[i - 7] == 'G':
+                    points += 5
+                elif be[i - 7] == 'S':
+                    points += 3
+                elif be[i - 7] == 'U':
+                    points += 2
+                elif be[i - 7] == 'A' or be[i - 7] == 'F' or ord(be[i - 7]) < 54:
+                    points -= 5
+                if be[i + 7] == 'P' or be[i + 7] == 'G':
+                    points += 5
+                elif be[i + 7] == 'S':
+                    points += 3
+                elif be[i + 7] == 'U':
+                    points += 2
+                elif be[i + 7] == 'A' or be[i + 7] == 'F' or ord(be[i + 7]) < 54:
+                    points -= 5
         return points
 
     def calc_points_expansion(self):
@@ -621,86 +621,88 @@ class Board:
         """
         tot_points = 0
         if 'capi' in args.exp:
-            be = [[]] * 6
-            be[0] = ['_'] * 7
-            be[1] = ['_'] + self.b[0] + ['_']
-            be[2] = ['_'] + self.b[1] + ['_']
-            be[3] = ['_'] + self.b[2] + ['_']
-            be[4] = ['_'] + self.b[3] + ['_']
-            be[5] = ['_'] * 7
+            be = ['_'] * 8
+            be += self.b[ 0: 5]
+            be += ['_'] * 2
+            be += self.b[ 5:10]
+            be += ['_'] * 2
+            be += self.b[10:15]
+            be += ['_'] * 2
+            be += self.b[15:20]
+            be += ['_'] * 8
             max_points = 0
-            for i in range(1, 5):
-                for j in range(1, 6):
-                    if be[i][j] == 'U':
-                        points = 0
-                        if be[i][j - 1] == 'P' or be[i][j - 1] == 'G':
-                            points += 5
-                        elif be[i][j - 1] == 'S':
-                            points += 3
-                        elif be[i][j - 1] == 'U':
-                            points += 2
-                        elif be[i][j - 1] == 'A' or be[i][j - 1] == 'F' or ord(be[i][j - 1]) < 54:
-                            points -= 5
-                        if be[i][j + 1] == 'P' or be[i][j + 1] == 'G':
-                            points += 5
-                        elif be[i][j + 1] == 'S':
-                            points += 3
-                        elif be[i][j + 1] == 'U':
-                            points += 2
-                        elif be[i][j + 1] == 'A' or be[i][j + 1] == 'F' or ord(be[i][j + 1]) < 54:
-                            points -= 5
-                        if be[i - 1][j] == 'P' or be[i - 1][j] == 'G':
-                            points += 5
-                        elif be[i - 1][j] == 'S':
-                            points += 3
-                        elif be[i - 1][j] == 'U':
-                            points += 2
-                        elif be[i - 1][j] == 'A' or be[i - 1][j] == 'F' or ord(be[i - 1][j]) < 54:
-                            points -= 5
-                        if be[i + 1][j] == 'P' or be[i + 1][j] == 'G':
-                            points += 5
-                        elif be[i + 1][j] == 'S':
-                            points += 3
-                        elif be[i + 1][j] == 'U':
-                            points += 2
-                        elif be[i + 1][j] == 'A' or be[i + 1][j] == 'F' or ord(be[i + 1][j]) < 54:
-                            points -= 5
-                        if points > max_points:
-                            max_points = points
+            for i in range(8, 34):
+                if be[i] == 'U':
+                    points = 0
+                    if be[i - 1] == 'P' or be[i - 1] == 'G':
+                        points += 5
+                    elif be[i - 1] == 'S':
+                        points += 3
+                    elif be[i - 1] == 'U':
+                        points += 2
+                    elif be[i - 1] == 'A' or be[i - 1] == 'F' or ord(be[i - 1]) < 54:
+                        points -= 5
+                    if be[i + 1] == 'P' or be[i + 1] == 'G':
+                        points += 5
+                    elif be[i + 1] == 'S':
+                        points += 3
+                    elif be[i + 1] == 'U':
+                        points += 2
+                    elif be[i + 1] == 'A' or be[i + 1] == 'F' or ord(be[i + 1]) < 54:
+                        points -= 5
+                    if be[i - 7] == 'P' or be[i - 7] == 'G':
+                        points += 5
+                    elif be[i - 7] == 'S':
+                        points += 3
+                    elif be[i - 7] == 'U':
+                        points += 2
+                    elif be[i - 7] == 'A' or be[i - 7] == 'F' or ord(be[i - 7]) < 54:
+                        points -= 5
+                    if be[i + 7] == 'P' or be[i + 7] == 'G':
+                        points += 5
+                    elif be[i + 7] == 'S':
+                        points += 3
+                    elif be[i + 7] == 'U':
+                        points += 2
+                    elif be[i + 7] == 'A' or be[i + 7] == 'F' or ord(be[i + 7]) < 54:
+                        points -= 5
+                    if points > max_points:
+                        max_points = points
             tot_points += max_points
         if 'plan' in args.exp:
-            is_b = [x != '_' for x in self.flat_b]
-            points  = is_b[ 0] and is_b[ 1] and is_b[ 5] and is_b[ 6]
-            points += is_b[10] and is_b[11] and is_b[15] and is_b[16]
-            points += is_b[ 3] and is_b[ 4] and is_b[ 8] and is_b[ 9]
-            points += is_b[13] and is_b[14] and is_b[18] and is_b[19]
-            points += is_b[ 2] and is_b[ 7] and is_b[12] and is_b[17]
+            nb_b_in_district = [0, 0, 0, 0, 0]
+            i_to_district = (0, 0, 1, 2, 2, 0, 0, 1, 2, 2, 3, 3, 1, 4, 4, 3, 3, 1, 4, 4)
+            for i in range(20):
+                if self.b[i] != '_':
+                    nb_b_in_district[i_to_district[i]] += 1
+            points = len([1 for x in nb_b_in_district if x == 4])
             if points == 5:
                 points = 6
             tot_points += points
         if 'fire' in args.exp:
-            be = [[]] * 6
-            be[0] = ['_'] * 7
-            be[1] = ['_'] + self.b[0] + ['_']
-            be[2] = ['_'] + self.b[1] + ['_']
-            be[3] = ['_'] + self.b[2] + ['_']
-            be[4] = ['_'] + self.b[3] + ['_']
-            be[5] = ['_'] * 7
+            be = ['_'] * 8
+            be += self.b[ 0: 5]
+            be += ['_'] * 2
+            be += self.b[ 5:10]
+            be += ['_'] * 2
+            be += self.b[10:15]
+            be += ['_'] * 2
+            be += self.b[15:20]
+            be += ['_'] * 8
             max_points = 0
-            for i in range(1, 5):
-                for j in range(1, 6):
-                    if be[i][j] == 'U':
-                        points = 0
-                        if be[i][j - 1] == 'A' or be[i][j - 1] == 'F':
-                            points += 3
-                        if be[i][j + 1] == 'A' or be[i][j + 1] == 'F':
-                            points += 3
-                        if be[i - 1][j] == 'A' or be[i - 1][j] == 'F':
-                            points += 3
-                        if be[i + 1][j] == 'A' or be[i + 1][j] == 'F':
-                            points += 3
-                        if points > max_points:
-                            max_points = points
+            for i in range(8, 34):
+                if be[i] == 'U':
+                    points = 0
+                    if be[i - 1] == 'A' or be[i - 1] == 'F':
+                        points += 3
+                    if be[i + 1] == 'A' or be[i + 1] == 'F':
+                        points += 3
+                    if be[i - 7] == 'A' or be[i - 7] == 'F':
+                        points += 3
+                    if be[i + 7] == 'A' or be[i + 7] == 'F':
+                        points += 3
+                    if points > max_points:
+                        max_points = points
             tot_points += max_points
         return tot_points
 
@@ -712,29 +714,29 @@ class Board:
             hor = 0
             for i in range(4):
                 j = 0
-                while j < 5 and ord(self.b[i][j]) >= 54:
+                while j < 5 and ord(self.b[i * 5 + j]) >= 54:
                     j += 1
                 if j < 4:
                     start = j
                     j += 1
-                    while j < 5 and ord(self.b[i][j]) < 54:
+                    while j < 5 and ord(self.b[i * 5 + j]) < 54:
                         j += 1
-                    len = j - start
-                    if len > hor:
-                        hor = len
+                    length = j - start
+                    if length > hor:
+                        hor = length
             ver = 0
             for j in range(5):
                 i = 0
-                while i < 4 and ord(self.b[i][j]) >= 54:
+                while i < 4 and ord(self.b[i * 5 + j]) >= 54:
                     i += 1
                 if i < 3:
                     start = i
                     i += 1
-                    while i < 4 and ord(self.b[i][j]) < 54:
+                    while i < 4 and ord(self.b[i * 5 + j]) < 54:
                         i += 1
-                    len = i - start
-                    if len > ver:
-                        ver = len
+                    length = i - start
+                    if length > ver:
+                        ver = length
             if ver == 4 or hor == 5:
                 points += 5
         if 'hall' in args.exp:
@@ -742,18 +744,18 @@ class Board:
         if 'park' in args.exp:
             cnt_PG = 0
             for i in range(20):
-                if self.flat_b[i] == 'P' or self.flat_b[i] == 'G':
+                if self.b[i] == 'P' or self.b[i] == 'G':
                         cnt_PG += 1
             points += cnt_PG
         if 'poli' in args.exp:
-            points += max(self.flat_f)
+            points += max(self.f)
         if 'repr' in args.exp:
             recycle_energy = max(self.energy - self.energy_used, 0)
             points += recycle_energy
         if 'scho' in args.exp:
             cnt_tower = 0
             for i in range(20):
-                if self.flat_b[i] == 'T':
+                if self.b[i] == 'T':
                     cnt_tower += 1
             points += cnt_tower
         return points
@@ -799,7 +801,7 @@ if args.mode == 'find':
     nr_boards_tried = 0
     max_max_points = 0
     bo = Board(extra_pop=args.extrapop)
-    while True:
+    while 1:
         bo.random_valid()
         nr_boards_tried += 1
         pts_tower = bo.calc_points_tower()
@@ -815,9 +817,9 @@ if args.mode == 'find':
         if points >= args.swapmin:
             max_bo = copy.deepcopy(bo)
             max_points = points
-            new_max_found = True
+            new_max_found = 1
             while new_max_found:
-                new_max_found = False
+                new_max_found = 0
                 bo.swap_init()
                 while bo.swap():
                     nr_boards_tried += 1
@@ -832,7 +834,7 @@ if args.mode == 'find':
                     if points > max_points:
                         max_bo = copy.deepcopy(bo)
                         max_points = points
-                        new_max_found = True
+                        new_max_found = 1
                 if new_max_found:
                     bo = copy.deepcopy(max_bo)
             if max_points > max_max_points:
@@ -846,7 +848,7 @@ if args.mode == 'find':
                 with open(filename, 'w') as f:
                     print(max_bo_string, file=f)
         if time.time() - t1 > 30:
-            print('speed {} {}'.format(int(nr_boards_tried / (time.time() - t1)), max_max_points))
+            print('speed {} {}'.format(int(nr_boards_tried // (time.time() - t1)), max_max_points))
             t1 = time.time()
             nr_boards_tried = 0
             max_max_points = 0
@@ -876,9 +878,9 @@ elif args.mode == 'opti':
         for args.exp in [x for x in itertools.combinations(exp_choices, len(args.exp))]:
             bo.calc_resources()
             if bo.popula_used <= bo.popula and bo.energy_used <= bo.energy:
-                new_max_found = True
+                new_max_found = 1
                 while new_max_found:
-                    new_max_found = False
+                    new_max_found = 0
                     bo.swap_init()
                     while bo.swap():
                         pts_tower = bo.calc_points_tower()
@@ -895,7 +897,7 @@ elif args.mode == 'opti':
                             max_bo = copy.deepcopy(bo)
                             max_points = points
                             max_exp = list(args.exp)
-                            new_max_found = True
+                            new_max_found = 1
                     if new_max_found:
                         bo = copy.deepcopy(max_bo)
         args.exp = list(max_exp)
